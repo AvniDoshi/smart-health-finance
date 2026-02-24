@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Compare Plans — Smart Health Finance</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="container topbar glass">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>Smart Health Finance</span>
+      </a>
+
+      <nav class="navlinks" aria-label="Primary">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="budget.html">Budget</a>
+        <a href="compare.html" aria-current="page">Compare</a>
+        <a href="hsa.html">HSA</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="assistant.html">AI Assistant</a>
+        <button class="btn btn-primary" id="signOutBtn" type="button">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="app">
+      <section class="main">
+        <div class="card pad-lg">
+          <h1 class="h2">Compare insurance plans</h1>
+          <p style="margin-top:8px;">Premium, deductible, copays, coinsurance, and out-of-pocket max.</p>
+          <p class="muted2" style="margin-top:6px;">
+            Focus: compare total expected yearly cost, not just monthly premium.
+          </p>
+        </div>
+
+        <div class="card pad-lg">
+          <h2 class="h3">Plan comparison (UI placeholder)</h2>
+          <div class="card pad" style="margin-top:12px;">
+            <p class="muted2">
+              Add later: plan cards/table + a “Why we recommend” explanation panel.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-rail">
+        <section class="card pad">
+          <strong>Quick question</strong>
+          <p style="margin-top:8px;">Why is the cheapest premium not always the cheapest plan?</p>
+          <div style="margin-top:10px;">
+            <a class="btn btn-ghost" href="assistant.html" style="width:100%;">Ask AI</a>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <div class="muted2">Compare page (demo).</div>
+    </footer>
+  </main>
+
+  <script>
+    async function requireSessionOrRedirect() {
+      try {
+        const res = await fetch('/api/me', {
+          credentials: 'same-origin',
+          cache: 'no-store'
+        });
+        const data = await res.json();
+
+        if (!data || !data.user) {
+          window.location.replace('signin.html');
+          return null;
+        }
+        return data.user;
+      } catch (e) {
+        window.location.replace('signin.html');
+        return null;
+      }
+    }
+
+    async function signOut() {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'same-origin'
+        });
+      } catch (e) {}
+      window.location.replace('index.html');
+    }
+
+    requireSessionOrRedirect();
+
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', signOut);
+  </script>
+</body>
+</html>

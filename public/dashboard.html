@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — Smart Health Finance</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="container topbar glass">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>Smart Health Finance</span>
+      </a>
+
+      <nav class="navlinks" aria-label="Primary">
+        <a href="dashboard.html" aria-current="page">Dashboard</a>
+        <a href="budget.html">Budget</a>
+        <a href="compare.html">Compare</a>
+        <a href="hsa.html">HSA</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="assistant.html">AI Assistant</a>
+        <button class="btn btn-primary" id="signOutBtn" type="button">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="app">
+      <section class="main" aria-label="Dashboard main content">
+        <div class="card pad-lg">
+          <h1 class="h2">Welcome back, <span id="userName" style="color:var(--primary);">Friend</span>!</h1>
+          <p style="margin-top:8px;">Here’s a quick overview of your health finance learning dashboard.</p>
+        </div>
+
+        <div class="card pad-lg" aria-labelledby="summary-title">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 id="summary-title" class="h3">Health Finance Summary</h2>
+            <span class="badge">Sample values</span>
+          </div>
+
+          <div class="summary" style="margin-top:12px;">
+            <div class="card kpi">
+              <div class="label">Monthly Cost (est.)</div>
+              <div class="value">$250</div>
+              <p class="muted2">Premiums + typical visits + meds</p>
+            </div>
+            <div class="card kpi">
+              <div class="label">HSA Balance</div>
+              <div class="value">$1,200</div>
+              <p class="muted2">Includes employer + your contributions</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card chart">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 class="h3">Short-Term Costs vs Long-Term Savings</h2>
+            <span class="badge">Chart placeholder</span>
+          </div>
+
+          <div class="chart-box" style="margin-top:12px;">Chart placeholder (later: real chart with JS)</div>
+
+          <p class="muted2" style="margin-top:10px;">
+            Next: build the estimator so the chart reflects your budget + plan choice.
+          </p>
+        </div>
+
+        <div class="card pad-lg">
+          <h2 class="h2">Go to a tool</h2>
+          <p style="margin-top:8px;">Choose what you want to work on right now.</p>
+
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:14px;">
+            <a class="card pad" href="budget.html">
+              <div class="badge">Budget</div>
+              <h3 class="h3" style="margin-top:10px;">Build a monthly estimate</h3>
+              <p style="margin-top:6px;">Routine vs unexpected expenses.</p>
+            </a>
+            <a class="card pad" href="compare.html">
+              <div class="badge">Compare</div>
+              <h3 class="h3" style="margin-top:10px;">Compare plans</h3>
+              <p style="margin-top:6px;">Premium, deductible, OOP max.</p>
+            </a>
+            <a class="card pad" href="hsa.html">
+              <div class="badge">HSA</div>
+              <h3 class="h3" style="margin-top:10px;">HSA learning modules</h3>
+              <p style="margin-top:6px;">Strategy + qualified expenses.</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-rail" aria-label="Right rail">
+        <section class="card chat">
+          <div class="chat-header">
+            <strong>AI Assistant</strong>
+            <span class="badge">Beta</span>
+          </div>
+
+          <div class="chat-bubble">
+            <strong class="muted">Ask AI about your healthcare</strong><br/>
+            <span class="muted2">Try: “Is preventive care free?”</span>
+          </div>
+
+          <div class="chat-bubble ai">
+            <strong>Is preventive care free?</strong>
+            <p style="margin-top:6px;">
+              Many plans cover certain preventive services at no cost when in-network.
+              But it depends on billing (preventive vs diagnostic).
+            </p>
+          </div>
+
+          <div class="chat-input">
+            <label for="q" style="position:absolute; left:-9999px;">Type a question</label>
+            <input id="q" type="text" placeholder="Type a question…" />
+            <button class="btn btn-primary" type="button">Send</button>
+          </div>
+
+          <div style="margin-top:10px;">
+            <a class="btn btn-ghost" href="assistant.html" style="width:100%;">Open full assistant</a>
+          </div>
+        </section>
+
+        <section class="card pad">
+          <strong>Quick Questions</strong>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+            <a class="pill" href="assistant.html">What is a deductible?</a>
+            <a class="pill" href="assistant.html">How do HSAs save taxes?</a>
+            <a class="pill" href="assistant.html">Should I pick the cheapest premium?</a>
+          </div>
+        </section>
+
+        <section class="card pad">
+          <div class="badge">Privacy</div>
+          <p style="margin-top:8px;">
+            This is “learning mode” with sample numbers until you connect real data/auth.
+          </p>
+        </section>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <div class="muted2">Tip: add real auth later. This is a UI/demo sign-in.</div>
+    </footer>
+  </main>
+
+  <script>
+    async function requireSession() {
+      try {
+        const res = await fetch('/api/me', {
+          credentials: 'same-origin',
+          cache: 'no-store'
+        });
+        const data = await res.json();
+
+        if (!data || !data.user) {
+          // Not signed in → go to sign in
+          window.location.replace('signin.html');
+          return null;
+        }
+
+        // Signed in → update UI
+        const el = document.getElementById('userName');
+        if (el) el.textContent = data.user.name || 'Friend';
+
+        return data.user;
+      } catch (e) {
+        // If backend is down, fail safe to sign in page
+        window.location.replace('signin.html');
+        return null;
+      }
+    }
+
+    async function signOut() {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'same-origin'
+        });
+      } catch (e) {
+        // even if request fails, still redirect
+      }
+      window.location.replace('index.html');
+    }
+
+    // Run auth check immediately
+    requireSession();
+
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', signOut);
+  </script>
+</body>
+</html>

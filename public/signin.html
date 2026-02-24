@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign In — Smart Health Finance</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="container topbar glass">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>Smart Health Finance</span>
+      </a>
+
+      <nav class="navlinks" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="assistant.html">AI Assistant</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="btn btn-ghost" href="index.html">Back</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="container" style="margin-top:16px;">
+    <section class="card pad-lg auth-wrap">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+        <div>
+          <span class="badge" id="modeBadge">Sign In</span>
+          <h1 class="h2" style="margin-top:10px;" id="modeTitle">Sign in to your dashboard</h1>
+          <p style="margin-top:8px; max-width:70ch;" id="modeDesc">
+            Use your account to access your dashboard and saved inputs.
+          </p>
+        </div>
+
+        <button class="btn btn-ghost" id="toggleModeBtn" type="button">
+          Create account
+        </button>
+      </div>
+
+      <form id="authForm" class="auth-form" style="margin-top:14px; display:none;">
+        <!-- Only shown in signup mode -->
+        <div class="field" id="nameField" style="display:none;">
+          <label for="name">Display name</label>
+          <input id="name" type="text" placeholder="e.g., Alex" autocomplete="name" />
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="At least 8 characters" autocomplete="current-password" required />
+        </div>
+
+        <div class="field" id="personaField">
+          <label for="persona">Learning profile (optional)</label>
+          <select id="persona">
+            <option value="student">Student</option>
+            <option value="early-career">Early career</option>
+            <option value="part-time">Part-time / gig</option>
+          </select>
+          <p class="muted2" style="margin-top:6px; font-size:13px;">
+            (Saved later in onboarding; safe to skip for now.)
+          </p>
+        </div>
+
+        <div id="errorBox" class="card pad" style="display:none; margin-top:10px; border-color: rgba(239,68,68,0.35);">
+          <strong style="color:#b91c1c;">Couldn’t sign in</strong>
+          <p id="errorText" class="muted2" style="margin-top:6px;"></p>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;">
+          <a class="btn btn-ghost" href="index.html">Cancel</a>
+          <button class="btn btn-primary" id="submitBtn" type="submit">Sign In</button>
+        </div>
+
+        <p class="muted2" style="margin-top:10px; font-size:13px;">
+          This is real session login (stored in a secure cookie). No localStorage auth.
+        </p>
+      </form>
+    </section>
+
+    <footer class="footer">
+      <div class="muted2">Educational guidance only — not medical or financial advice.</div>
+    </footer>
+  </main>
+
+  <script>
+      const authForm = document.getElementById('authForm');
+
+      const state = { mode: 'signin' }; // 'signin' | 'signup'
+
+      const toggleModeBtn = document.getElementById('toggleModeBtn');
+      const modeBadge = document.getElementById('modeBadge');
+      const modeTitle = document.getElementById('modeTitle');
+      const modeDesc = document.getElementById('modeDesc');
+      const nameField = document.getElementById('nameField');
+      const submitBtn = document.getElementById('submitBtn');
+
+      const errorBox = document.getElementById('errorBox');
+      const errorText = document.getElementById('errorText');
+
+      function showError(msg){
+        errorText.textContent = msg || 'Something went wrong.';
+        errorBox.style.display = 'block';
+      }
+
+      function hideError(){
+        errorBox.style.display = 'none';
+        errorText.textContent = '';
+      }
+
+      function setMode(mode){
+        state.mode = mode;
+
+        const isSignup = mode === 'signup';
+        nameField.style.display = isSignup ? 'block' : 'none';
+
+        modeBadge.textContent = isSignup ? 'Create Account' : 'Sign In';
+        modeTitle.textContent = isSignup ? 'Create your account' : 'Sign in to your dashboard';
+        modeDesc.textContent = isSignup
+          ? 'Create an account to save your onboarding, budget, and comparisons.'
+          : 'Use your account to access your dashboard and saved inputs.';
+
+        submitBtn.textContent = isSignup ? 'Create Account' : 'Sign In';
+        toggleModeBtn.textContent = isSignup ? 'Have an account?' : 'Create account';
+
+        hideError();
+      }
+
+      toggleModeBtn.addEventListener('click', () => {
+        setMode(state.mode === 'signin' ? 'signup' : 'signin');
+      });
+
+      async function checkSessionAndMaybeRedirect() {
+        try {
+          const res = await fetch('/api/me', {
+            credentials: 'same-origin',
+            cache: 'no-store'
+          });
+          const data = await res.json();
+
+          if (data && data.user) {
+            // Use replace so "Back" doesn't bounce you here again
+            window.location.replace('dashboard.html');
+            return;
+          }
+        } catch (e) {
+          // If backend is down, we still show the form
+        }
+
+        // Not signed in → show form once
+        if (authForm) authForm.style.display = 'block';
+      }
+
+      document.getElementById('authForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideError();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value.trim();
+
+        if (!email || !password) return showError('Please enter email and password.');
+        if (state.mode === 'signup' && (!name || name.length < 2)) return showError('Please enter a display name.');
+
+        try {
+          const endpoint = state.mode === 'signup' ? '/api/auth/signup' : '/api/auth/login';
+          const payload = state.mode === 'signup'
+            ? { email, name, password }
+            : { email, password };
+
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            return showError(data.error || 'Unable to authenticate.');
+          }
+
+          // Success → dashboard (use replace to prevent bounce)
+          window.location.replace('dashboard.html');
+        } catch (err) {
+          showError('Network/server error. Is the backend running on http://localhost:3000?');
+        }
+      });
+
+      // Initialize
+      setMode('signin');
+      checkSessionAndMaybeRedirect();
+  </script>
+</body>
+</html>
