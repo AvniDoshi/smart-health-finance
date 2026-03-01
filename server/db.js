@@ -9,6 +9,7 @@ const db = new Database(dbPath);
 
 db.exec(`
 PRAGMA journal_mode = WAL;
+PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS onboarding (
   income_comfort TEXT,
   topics TEXT,
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY(user_id) REFERENCES users(id)
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS budget (
@@ -40,7 +41,29 @@ CREATE TABLE IF NOT EXISTS budget (
   emergency_buffer_target REAL DEFAULT 0,
   computed_monthly_estimate REAL DEFAULT 0,
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS hsa (
+  user_id INTEGER PRIMARY KEY,
+  coverage_type TEXT,
+  annual_limit REAL DEFAULT 0,
+  current_balance REAL DEFAULT 0,
+  monthly_contrib_self REAL DEFAULT 0,
+  monthly_contrib_employer REAL DEFAULT 0,
+  invest_percent INTEGER DEFAULT 0,
+  expected_annual_expenses REAL DEFAULT 0,
+  strategy_notes TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS compare (
+  user_id INTEGER PRIMARY KEY,
+  data_json TEXT NOT NULL,
+  last_result_json TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 `);
 

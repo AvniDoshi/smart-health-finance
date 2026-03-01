@@ -43,23 +43,104 @@
             HSAs can help pay for qualified medical expenses now — and can also support future healthcare costs.
           </p>
           <p class="muted2" style="margin-top:6px;">
-            Start here: learn the basics first, then build a simple contribution strategy.
+            Start here: enter your basics, then we’ll estimate how close you are to your annual contribution goal.
           </p>
         </div>
 
         <div class="card pad-lg">
-          <h2 class="h3">Learning modules (UI placeholder)</h2>
-          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:12px;">
-            <div class="card pad">
-              <div class="badge">Module 1</div>
-              <h3 class="h3" style="margin-top:10px;">HSA Basics</h3>
-              <p style="margin-top:6px;">Eligibility + what counts as a qualified expense.</p>
+          <h2 class="h3">Your HSA details</h2>
+
+          <form id="hsaForm" style="margin-top:12px; display:grid; gap:12px; max-width: 860px;">
+            <div class="field">
+              <label for="coverageType">Coverage type</label>
+              <select id="coverageType">
+                <option value="unknown">Not sure</option>
+                <option value="self">Self-only</option>
+                <option value="family">Family</option>
+              </select>
+              <p class="muted2" style="margin-top:6px; font-size:13px;">
+                This affects IRS limits, but we still ask you to enter your annual limit below (to keep it accurate).
+              </p>
             </div>
-            <div class="card pad">
-              <div class="badge">Module 2</div>
-              <h3 class="h3" style="margin-top:10px;">Contribution Strategy</h3>
-              <p style="margin-top:6px;">Start small, build a buffer, then invest when ready.</p>
+
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px;">
+              <div class="field">
+                <label for="annualLimit">Your annual contribution limit (enter the number you want to target)</label>
+                <input id="annualLimit" type="number" min="0" step="1" placeholder="ex. 4150" required />
+              </div>
+
+              <div class="field">
+                <label for="currentBalance">Current HSA balance</label>
+                <input id="currentBalance" type="number" min="0" step="1" placeholder="ex. 1200" />
+              </div>
             </div>
+
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px;">
+              <div class="field">
+                <label for="monthlyContribSelf">Your monthly contribution</label>
+                <input id="monthlyContribSelf" type="number" min="0" step="1" placeholder="ex. 150" />
+              </div>
+
+              <div class="field">
+                <label for="monthlyContribEmployer">Employer monthly contribution (if any)</label>
+                <input id="monthlyContribEmployer" type="number" min="0" step="1" placeholder="ex. 50" />
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px;">
+              <div class="field">
+                <label for="expectedAnnualExpenses">Expected qualified expenses this year (estimate)</label>
+                <input id="expectedAnnualExpenses" type="number" min="0" step="1" placeholder="ex. 600" />
+              </div>
+
+              <div class="field">
+                <label for="investPercent">Investing preference (0–100%)</label>
+                <input id="investPercent" type="number" min="0" max="100" step="1" placeholder="ex. 30" />
+                <p class="muted2" style="margin-top:6px; font-size:13px;">
+                  This is just a planning preference (not financial advice).
+                </p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="strategyNotes">Notes (optional)</label>
+              <textarea id="strategyNotes" rows="3" placeholder="ex. I want to keep ~$500 cash for near-term expenses."></textarea>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="btn btn-ghost" id="resetBtn" type="button">Reset</button>
+              <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+
+            <div id="saveMsg" class="muted2" style="display:none;"></div>
+          </form>
+        </div>
+
+        <div class="card pad-lg" aria-live="polite">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 class="h3">Your HSA plan summary</h2>
+            <span class="badge" id="statusBadge">Live</span>
+          </div>
+
+          <div class="summary" style="margin-top:12px;">
+            <div class="card kpi">
+              <div class="label">Planned annual contributions</div>
+              <div class="value" id="plannedAnnual">$0</div>
+              <p class="muted2">You + employer (monthly × 12)</p>
+            </div>
+
+            <div class="card kpi">
+              <div class="label">Remaining contribution room</div>
+              <div class="value" id="remainingRoom">$0</div>
+              <p class="muted2">Based on your annual target</p>
+            </div>
+          </div>
+
+          <div class="card pad" style="margin-top:12px;">
+            <strong>Suggested next step</strong>
+            <p class="muted2" id="nextStepText" style="margin-top:8px;">
+              Enter your annual target and monthly contributions to see suggestions.
+            </p>
           </div>
         </div>
       </section>
@@ -71,26 +152,31 @@
             If you’re new to HSAs, aim for a small monthly contribution you can keep consistent.
           </p>
           <div style="margin-top:10px;">
-            <a class="btn btn-ghost" href="assistant.html" style="width:100%;">Ask AI for a strategy</a>
+            <button class="btn btn-ghost" id="askAiBtn" type="button" style="width:100%;">
+              Ask AI for a strategy
+            </button>
           </div>
+        </section>
+
+        <section class="card pad">
+          <strong>Quick checklist</strong>
+          <p class="muted2" style="margin-top:8px;">
+            A simple approach: keep cash for near-term expenses, then invest the rest (if your plan allows).
+          </p>
         </section>
       </aside>
     </section>
 
     <footer class="footer">
-      <div class="muted2">HSA page (demo).</div>
+      <div class="muted2">HSA tool (saved per account).</div>
     </footer>
   </main>
 
   <script>
-    async function requireSessionOrRedirect() {
+    async function requireSession() {
       try {
-        const res = await fetch('/api/me', {
-          credentials: 'same-origin',
-          cache: 'no-store'
-        });
+        const res = await fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' });
         const data = await res.json();
-
         if (!data || !data.user) {
           window.location.replace('signin.html');
           return null;
@@ -104,18 +190,167 @@
 
     async function signOut() {
       try {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          credentials: 'same-origin'
-        });
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
       } catch (e) {}
       window.location.replace('index.html');
     }
 
-    requireSessionOrRedirect();
+    const $ = (id) => document.getElementById(id);
 
-    const signOutBtn = document.getElementById('signOutBtn');
-    if (signOutBtn) signOutBtn.addEventListener('click', signOut);
+    function money(x){
+      const n = Number(x) || 0;
+      return n.toLocaleString(undefined, { style:'currency', currency:'USD', maximumFractionDigits: 0 });
+    }
+
+    function monthsRemainingInYear() {
+      const now = new Date();
+      const month = now.getMonth(); // 0-11
+      return Math.max(1, 12 - month); // include current month
+    }
+
+    function computeAndRender() {
+      const annualLimit = Number($('annualLimit').value) || 0;
+      const monthlySelf = Number($('monthlyContribSelf').value) || 0;
+      const monthlyEmployer = Number($('monthlyContribEmployer').value) || 0;
+      const expectedAnnualExpenses = Number($('expectedAnnualExpenses').value) || 0;
+      const investPercent = Math.max(0, Math.min(100, parseInt($('investPercent').value || '0', 10)));
+
+      const plannedAnnual = (monthlySelf + monthlyEmployer) * 12;
+      const remainingRoom = Math.max(0, annualLimit - plannedAnnual);
+
+      $('plannedAnnual').textContent = money(plannedAnnual);
+      $('remainingRoom').textContent = money(remainingRoom);
+
+      const mLeft = monthsRemainingInYear();
+
+      let next = '';
+      if (annualLimit <= 0) {
+        next = 'Enter your annual target limit to get suggestions.';
+      } else if (plannedAnnual >= annualLimit) {
+        next =
+          `You’re on track to hit (or exceed) your annual target. ` +
+          `If you expect about ${money(expectedAnnualExpenses)} in qualified expenses, consider keeping some cash for near-term spending and investing the rest (your preference: ${investPercent}%).`;
+      } else {
+        const shortfall = annualLimit - plannedAnnual;
+        const addlMonthly = Math.ceil(shortfall / mLeft);
+        next =
+          `To reach your annual target by year-end, you’d need about ${money(addlMonthly)}/month extra for the remaining ${mLeft} month(s). ` +
+          `If you expect ${money(expectedAnnualExpenses)} in qualified expenses, consider keeping that amount liquid and investing the rest (preference: ${investPercent}%).`;
+      }
+      $('nextStepText').textContent = next;
+    }
+
+    async function loadSavedHsa() {
+      const res = await fetch('/api/hsa', { credentials: 'same-origin', cache: 'no-store' });
+      if (res.status === 401) {
+        window.location.replace('signin.html');
+        return;
+      }
+      const data = await res.json();
+      if (!data || !data.hsa) return;
+
+      const h = data.hsa;
+      $('coverageType').value = h.coverage_type || 'unknown';
+      $('annualLimit').value = h.annual_limit ?? '';
+      $('currentBalance').value = h.current_balance ?? '';
+      $('monthlyContribSelf').value = h.monthly_contrib_self ?? '';
+      $('monthlyContribEmployer').value = h.monthly_contrib_employer ?? '';
+      $('investPercent').value = h.invest_percent ?? '';
+      $('expectedAnnualExpenses').value = h.expected_annual_expenses ?? '';
+      $('strategyNotes').value = h.strategy_notes ?? '';
+
+      computeAndRender();
+    }
+
+    async function saveHsa(e) {
+      e.preventDefault();
+      $('saveMsg').style.display = 'none';
+
+      const payload = {
+        coverageType: $('coverageType').value,
+        annualLimit: $('annualLimit').value,
+        currentBalance: $('currentBalance').value,
+        monthlyContribSelf: $('monthlyContribSelf').value,
+        monthlyContribEmployer: $('monthlyContribEmployer').value,
+        investPercent: $('investPercent').value,
+        expectedAnnualExpenses: $('expectedAnnualExpenses').value,
+        strategyNotes: $('strategyNotes').value
+      };
+
+      const res = await fetch('/api/hsa', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(payload)
+      });
+
+      if (res.status === 401) {
+        window.location.replace('signin.html');
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        $('saveMsg').textContent = (data && data.error) ? data.error : 'Could not save.';
+        $('saveMsg').style.display = 'block';
+        return;
+      }
+
+      $('saveMsg').textContent = 'Saved ✅';
+      $('saveMsg').style.display = 'block';
+      computeAndRender();
+      setTimeout(() => { $('saveMsg').style.display = 'none'; }, 1200);
+    }
+
+    function resetForm(){
+      $('coverageType').value = 'unknown';
+      $('annualLimit').value = '';
+      $('currentBalance').value = '';
+      $('monthlyContribSelf').value = '';
+      $('monthlyContribEmployer').value = '';
+      $('investPercent').value = '';
+      $('expectedAnnualExpenses').value = '';
+      $('strategyNotes').value = '';
+      computeAndRender();
+    }
+
+    // Ask AI: send user to assistant with a prefilled question
+    function buildAiPrompt(){
+      const annualLimit = Number($('annualLimit').value) || 0;
+      const monthlySelf = Number($('monthlyContribSelf').value) || 0;
+      const monthlyEmployer = Number($('monthlyContribEmployer').value) || 0;
+      const expectedAnnualExpenses = Number($('expectedAnnualExpenses').value) || 0;
+      const investPercent = Math.max(0, Math.min(100, parseInt($('investPercent').value || '0', 10)));
+
+      return `Build me an HSA strategy with my numbers:
+- Annual target: $${annualLimit}
+- Monthly me: $${monthlySelf}
+- Monthly employer: $${monthlyEmployer}
+- Expected qualified expenses this year: $${expectedAnnualExpenses}
+- Investing preference: ${investPercent}%.
+Give me a simple monthly plan and what to keep as cash vs invest.`;
+    }
+
+    (async function init(){
+      await requireSession();
+
+      $('signOutBtn').addEventListener('click', signOut);
+
+      // Live update
+      $('hsaForm').addEventListener('input', computeAndRender);
+      $('hsaForm').addEventListener('change', computeAndRender);
+
+      $('hsaForm').addEventListener('submit', saveHsa);
+      $('resetBtn').addEventListener('click', resetForm);
+
+      $('askAiBtn').addEventListener('click', () => {
+        const q = encodeURIComponent(buildAiPrompt());
+        window.location.href = `assistant.html?q=${q}`;
+      });
+
+      computeAndRender();
+      loadSavedHsa();
+    })();
   </script>
 </body>
 </html>

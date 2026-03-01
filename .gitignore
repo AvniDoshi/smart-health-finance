@@ -1,5 +1,23 @@
+# Node
 node_modules/
+
+# Environment / secrets
 .env
+.env.*
+!.env.example
+
+# Database (SQLite)
 *.sqlite
-.DS_Store
+*.db
+
+# Logs
 npm-debug.log*
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build / temp
+dist/
+build/

@@ -11,32 +11,31 @@
 
   <header class="container topbar glass">
     <div class="topbar-inner">
-        
-        <!-- Brand -->
-        <a class="brand" href="index.html">
+
+      <!-- Brand -->
+      <a class="brand" href="index.html">
         <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
+          <svg viewBox="0 0 24 24" fill="none">
             <path d="M12 5v14M5 12h14"
-                    stroke="white"
-                    stroke-width="2.5"
-                    stroke-linecap="round"/>
-            </svg>
+                  stroke="white"
+                  stroke-width="2.5"
+                  stroke-linecap="round"/>
+          </svg>
         </span>
         <span>Smart Health Finance</span>
-        </a>
+      </a>
 
-        <!-- Main navigation (NO AI Assistant link here) -->
-        <nav class="navlinks" aria-label="Primary">
+      <!-- Main navigation -->
+      <nav class="navlinks" aria-label="Primary">
         <a href="dashboard.html">Dashboard</a>
         <a href="budget.html">Budget</a>
         <a href="compare.html">Compare</a>
         <a href="hsa.html">HSA</a>
-        </nav>
+      </nav>
 
-        <!-- Right-side actions -->
-        <div class="nav-actions" id="authActions">
-
-        <!-- Logged-out state -->
+      <!-- Right-side actions -->
+      <div class="nav-actions" id="authActions">
+        <!-- Logged-out state (will be hidden after session check if logged in) -->
         <a class="btn btn-ghost" href="signin.html" id="signInBtn">Sign In</a>
         <a class="btn btn-primary" href="onboarding.html" id="getStartedBtn">Get Started</a>
 
@@ -44,21 +43,21 @@
         <button class="btn btn-primary" id="signOutBtn"
                 type="button"
                 style="display:none;">
-            Sign Out
+          Sign Out
         </button>
+      </div>
 
-        </div>
     </div>
- </header>
+  </header>
 
   <main id="main" class="container">
     <section class="card pad-lg" style="margin-top:16px;">
       <h1 class="h2">Ask AI About Your Healthcare</h1>
       <p style="margin-top:8px; max-width: 85ch;">
         The assistant explains HSAs, insurance terms, and preventive care in plain language.
-        (This is a UI shell — connect it to your backend/LLM later.)
       </p>
 
+      <!-- These are section jump links (NOT auto-send) -->
       <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
         <a class="pill" href="#hsa-basics">HSA Basics</a>
         <a class="pill" href="#insurance-terms">Insurance Terms</a>
@@ -74,6 +73,7 @@
             <span class="badge">Student-focused</span>
           </div>
 
+          <!-- Chat messages will append above input -->
           <div class="chat-bubble">
             <strong>You:</strong> Is preventive care free?
           </div>
@@ -89,7 +89,7 @@
           <div class="chat-input">
             <label for="chatq" style="position:absolute; left:-9999px;">Type a question</label>
             <input id="chatq" type="text" placeholder="Type a question…" />
-            <button class="btn btn-primary" type="button">Send</button>
+            <button class="btn btn-primary" type="button" id="sendBtn">Send</button>
           </div>
         </section>
 
@@ -112,67 +112,171 @@
       <aside class="right-rail">
         <section class="card pad">
           <strong>Try asking</strong>
-          <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
-            <a class="pill" href="#insurance-terms">What is a deductible?</a>
-            <a class="pill" href="#hsa-basics">What counts as a qualified expense?</a>
-            <a class="pill" href="#preventive">Preventive vs diagnostic visit?</a>
+
+          <!-- These are the ONLY pills that should auto-send -->
+          <div id="quickQuestions" style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+            <button class="pill" type="button">What is a deductible?</button>
+            <button class="pill" type="button">What counts as a qualified expense?</button>
+            <button class="pill" type="button">Preventive vs diagnostic visit?</button>
           </div>
+
         </section>
       </aside>
     </section>
 
     <footer class="footer">
-      <div class="muted2">Next: wire “Send” to your backend and render messages dynamically.</div>
+      <div class="muted2">Educational guidance only — not medical or financial advice.</div>
     </footer>
   </main>
 
   <script>
-    async function getSessionUser() {
+    const chatInput = document.getElementById("chatq");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatBox = document.querySelector(".card.chat");
+    const main = document.querySelector(".main");
+
+    const signInBtn = document.getElementById('signInBtn');
+    const getStartedBtn = document.getElementById('getStartedBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+
+    let history = [];
+
+    function addMessage(role, text) {
+      const bubble = document.createElement("div");
+      bubble.className = role === "user" ? "chat-bubble" : "chat-bubble ai";
+
+      bubble.innerHTML =
+        role === "user"
+          ? `<strong>You:</strong> ${escapeHtml(text)}`
+          : `<strong>AI:</strong><p style="margin-top:6px;">${escapeHtml(text)}</p>`;
+
+      chatBox.insertBefore(bubble, chatBox.querySelector(".chat-input"));
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function expandChat() {
+      // Make chat take full width of the app grid
+      main.style.gridColumn = "1 / -1";
+      chatBox.style.minHeight = "70vh";
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function requireSessionOrRedirect() {
       try {
         const res = await fetch('/api/me', {
           credentials: 'same-origin',
           cache: 'no-store'
         });
         const data = await res.json();
-        return data && data.user ? data.user : null;
+
+        if (!data || !data.user) {
+          window.location.replace('signin.html');
+          return null;
+        }
+
+        // Logged in: hide sign-in buttons, show sign-out
+        if (signInBtn) signInBtn.style.display = 'none';
+        if (getStartedBtn) getStartedBtn.style.display = 'none';
+        if (signOutBtn) signOutBtn.style.display = 'inline-flex';
+
+        return data.user;
       } catch (e) {
+        window.location.replace('signin.html');
         return null;
       }
     }
 
-    async function updateAuthButtons() {
-      const signInBtn = document.getElementById('signInBtn');
-      const getStartedBtn = document.getElementById('getStartedBtn');
-      const signOutBtn = document.getElementById('signOutBtn');
-
-      const user = await getSessionUser();
-
-      if (user) {
-        // Logged in
-        if (signInBtn) signInBtn.style.display = 'none';
-        if (getStartedBtn) getStartedBtn.style.display = 'none';
-        if (signOutBtn) signOutBtn.style.display = 'inline-flex';
-      } else {
-        // Logged out
-        if (signInBtn) signInBtn.style.display = 'inline-flex';
-        if (getStartedBtn) getStartedBtn.style.display = 'inline-flex';
-        if (signOutBtn) signOutBtn.style.display = 'none';
-      }
-
-      if (signOutBtn) {
-        signOutBtn.addEventListener('click', async () => {
-          try {
-            await fetch('/api/auth/logout', {
-              method: 'POST',
-              credentials: 'same-origin'
-            });
-          } catch (e) {}
-          window.location.replace('index.html');
+    async function signOut() {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'same-origin'
         });
+      } catch (e) {}
+      window.location.replace('index.html');
+    }
+
+    async function sendMessage(text) {
+      if (!text) return;
+
+      expandChat();
+
+      addMessage("user", text);
+      history.push({ role: "user", content: text });
+
+      chatInput.value = "";
+
+      try {
+        const res = await fetch("/api/assistant/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ message: text, history })
+        });
+
+        if (res.status === 401) {
+          window.location.replace("signin.html");
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        const reply = data.reply || "No response.";
+        addMessage("assistant", reply);
+        history.push({ role: "assistant", content: reply });
+      } catch (e) {
+        addMessage("assistant", "Network/server error. Please try again.");
       }
     }
 
-    updateAuthButtons();
+    // Send button
+    sendBtn.addEventListener("click", () => {
+      sendMessage(chatInput.value.trim());
+    });
+
+    // Enter to send
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage(chatInput.value.trim());
+      }
+    });
+
+    // Quick question buttons (ONLY right-rail)
+    document.querySelectorAll("#quickQuestions .pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const text = btn.textContent.trim();
+        chatInput.value = text;
+        sendMessage(text);
+      });
+    });
+      async function init() {
+        // Require login first (and update buttons)
+        const user = await requireSessionOrRedirect();
+        if (!user) return;
+
+        // Hook sign-out
+        if (signOutBtn) signOutBtn.addEventListener("click", signOut);
+
+        // If assistant.html?q=... is present, auto-fill + send once
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get("q");
+        if (q) {
+          chatInput.value = q;
+          await sendMessage(q);
+          // clean URL so refresh doesn't resend
+          window.history.replaceState({}, "", "assistant.html");
+        }
+      }
+
+      init();
   </script>
 </body>
 </html>

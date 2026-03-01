@@ -39,18 +39,162 @@
       <section class="main">
         <div class="card pad-lg">
           <h1 class="h2">Compare insurance plans</h1>
-          <p style="margin-top:8px;">Premium, deductible, copays, coinsurance, and out-of-pocket max.</p>
+          <p style="margin-top:8px;">
+            Premium, deductible, copays, coinsurance, and out-of-pocket max.
+          </p>
           <p class="muted2" style="margin-top:6px;">
-            Focus: compare total expected yearly cost, not just monthly premium.
+            This calculator estimates your total yearly cost based on your expected care.
           </p>
         </div>
 
         <div class="card pad-lg">
-          <h2 class="h3">Plan comparison (UI placeholder)</h2>
+          <h2 class="h3">Your expected care (yearly)</h2>
+
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:12px;">
+            <div class="field">
+              <label for="allowedSpend">Expected allowed medical spend ($)</label>
+              <input id="allowedSpend" type="number" min="0" step="1" placeholder="ex. 1500" />
+              <p class="muted2" style="margin-top:6px; font-size:13px;">
+                Rough estimate of total billed/allowed charges (not including premiums).
+              </p>
+            </div>
+
+            <div class="field">
+              <label for="primaryVisits">Primary care visits / year</label>
+              <input id="primaryVisits" type="number" min="0" step="1" value="2" />
+            </div>
+
+            <div class="field">
+              <label for="specialistVisits">Specialist visits / year</label>
+              <input id="specialistVisits" type="number" min="0" step="1" value="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card pad-lg">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 class="h3">Plan inputs</h2>
+            <span class="badge">Saved per account</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; margin-top:12px;">
+            <!-- Plan A -->
+            <div class="card pad">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <strong>Plan A</strong>
+                <span class="badge" id="planAResultBadge" style="display:none;"></span>
+              </div>
+
+              <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:12px;">
+                <div class="field">
+                  <label for="aPremium">Monthly premium ($)</label>
+                  <input id="aPremium" type="number" min="0" step="1" placeholder="ex. 180" />
+                </div>
+
+                <div class="field">
+                  <label for="aDeductible">Deductible ($)</label>
+                  <input id="aDeductible" type="number" min="0" step="1" placeholder="ex. 1500" />
+                </div>
+
+                <div class="field">
+                  <label for="aCoins">Coinsurance (%)</label>
+                  <input id="aCoins" type="number" min="0" max="100" step="1" placeholder="ex. 20" />
+                </div>
+
+                <div class="field">
+                  <label for="aOop">Out-of-pocket max ($)</label>
+                  <input id="aOop" type="number" min="0" step="1" placeholder="ex. 6500" />
+                </div>
+
+                <div class="field">
+                  <label for="aCopayP">Primary copay ($)</label>
+                  <input id="aCopayP" type="number" min="0" step="1" placeholder="ex. 25" />
+                </div>
+
+                <div class="field">
+                  <label for="aCopayS">Specialist copay ($)</label>
+                  <input id="aCopayS" type="number" min="0" step="1" placeholder="ex. 50" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Plan B -->
+            <div class="card pad">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <strong>Plan B</strong>
+                <span class="badge" id="planBResultBadge" style="display:none;"></span>
+              </div>
+
+              <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:12px;">
+                <div class="field">
+                  <label for="bPremium">Monthly premium ($)</label>
+                  <input id="bPremium" type="number" min="0" step="1" placeholder="ex. 120" />
+                </div>
+
+                <div class="field">
+                  <label for="bDeductible">Deductible ($)</label>
+                  <input id="bDeductible" type="number" min="0" step="1" placeholder="ex. 3000" />
+                </div>
+
+                <div class="field">
+                  <label for="bCoins">Coinsurance (%)</label>
+                  <input id="bCoins" type="number" min="0" max="100" step="1" placeholder="ex. 30" />
+                </div>
+
+                <div class="field">
+                  <label for="bOop">Out-of-pocket max ($)</label>
+                  <input id="bOop" type="number" min="0" step="1" placeholder="ex. 8000" />
+                </div>
+
+                <div class="field">
+                  <label for="bCopayP">Primary copay ($)</label>
+                  <input id="bCopayP" type="number" min="0" step="1" placeholder="ex. 20" />
+                </div>
+
+                <div class="field">
+                  <label for="bCopayS">Specialist copay ($)</label>
+                  <input id="bCopayS" type="number" min="0" step="1" placeholder="ex. 60" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="errorBox" class="card pad" style="display:none; margin-top:12px; border-color: rgba(239,68,68,0.35);">
+            <strong style="color:#b91c1c;">Couldn’t calculate</strong>
+            <p id="errorText" class="muted2" style="margin-top:6px;"></p>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:14px;">
+            <button class="btn btn-ghost" id="calcBtn" type="button">Calculate</button>
+            <button class="btn btn-primary" id="saveBtn" type="button">Save</button>
+          </div>
+        </div>
+
+        <div class="card pad-lg" id="resultsCard" style="display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 class="h3">Results</h2>
+            <span class="badge" id="winnerBadge"></span>
+          </div>
+
+          <div class="summary" style="margin-top:12px;">
+            <div class="card kpi">
+              <div class="label">Plan A yearly cost (est.)</div>
+              <div class="value" id="aYearly">$0</div>
+              <p class="muted2" id="aBreakdown"></p>
+            </div>
+            <div class="card kpi">
+              <div class="label">Plan B yearly cost (est.)</div>
+              <div class="value" id="bYearly">$0</div>
+              <p class="muted2" id="bBreakdown"></p>
+            </div>
+          </div>
+
           <div class="card pad" style="margin-top:12px;">
-            <p class="muted2">
-              Add later: plan cards/table + a “Why we recommend” explanation panel.
-            </p>
+            <strong>Why this recommendation?</strong>
+            <p class="muted2" id="whyText" style="margin-top:8px;"></p>
+            <div style="margin-top:10px;">
+              <a class="btn btn-ghost" id="askAiLink" href="assistant.html">Ask AI about this</a>
+            </div>
           </div>
         </div>
       </section>
@@ -60,32 +204,58 @@
           <strong>Quick question</strong>
           <p style="margin-top:8px;">Why is the cheapest premium not always the cheapest plan?</p>
           <div style="margin-top:10px;">
-            <a class="btn btn-ghost" href="assistant.html" style="width:100%;">Ask AI</a>
+            <a class="btn btn-ghost" href="assistant.html?q=Why%20is%20the%20cheapest%20premium%20not%20always%20the%20cheapest%20plan%3F" style="width:100%;">Ask AI</a>
           </div>
+        </section>
+
+        <section class="card pad">
+          <div class="badge">Tip</div>
+          <p style="margin-top:8px;">
+            If you expect low care use, premiums matter more. If you expect high care use, deductible/OOP max often matter more.
+          </p>
         </section>
       </aside>
     </section>
 
     <footer class="footer">
-      <div class="muted2">Compare page (demo).</div>
+      <div class="muted2">Compare page (now functional).</div>
     </footer>
   </main>
 
   <script>
-    async function requireSessionOrRedirect() {
-      try {
-        const res = await fetch('/api/me', {
-          credentials: 'same-origin',
-          cache: 'no-store'
-        });
-        const data = await res.json();
+    function $(id){ return document.getElementById(id); }
 
+    function n(x){
+      const v = Number(x);
+      return Number.isFinite(v) ? v : 0;
+    }
+    function i(x){
+      const v = parseInt(x, 10);
+      return Number.isFinite(v) ? v : 0;
+    }
+    function money(x){
+      return `$${Math.round(x).toLocaleString()}`;
+    }
+
+    function showError(msg){
+      $('errorText').textContent = msg || 'Something went wrong.';
+      $('errorBox').style.display = 'block';
+    }
+    function hideError(){
+      $('errorBox').style.display = 'none';
+      $('errorText').textContent = '';
+    }
+
+    async function requireSession() {
+      try {
+        const res = await fetch('/api/me', { credentials:'same-origin', cache:'no-store' });
+        const data = await res.json();
         if (!data || !data.user) {
           window.location.replace('signin.html');
           return null;
         }
         return data.user;
-      } catch (e) {
+      } catch {
         window.location.replace('signin.html');
         return null;
       }
@@ -93,18 +263,167 @@
 
     async function signOut() {
       try {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          credentials: 'same-origin'
-        });
-      } catch (e) {}
+        await fetch('/api/auth/logout', { method:'POST', credentials:'same-origin' });
+      } catch {}
       window.location.replace('index.html');
     }
 
-    requireSessionOrRedirect();
+    function getPayload(){
+      return {
+        expected: {
+          allowedSpend: n($('allowedSpend').value),
+          primaryVisits: i($('primaryVisits').value),
+          specialistVisits: i($('specialistVisits').value),
+        },
+        planA: {
+          premiumMonthly: n($('aPremium').value),
+          deductible: n($('aDeductible').value),
+          coinsurancePct: n($('aCoins').value),
+          oopMax: n($('aOop').value),
+          copayPrimary: n($('aCopayP').value),
+          copaySpecialist: n($('aCopayS').value),
+        },
+        planB: {
+          premiumMonthly: n($('bPremium').value),
+          deductible: n($('bDeductible').value),
+          coinsurancePct: n($('bCoins').value),
+          oopMax: n($('bOop').value),
+          copayPrimary: n($('bCopayP').value),
+          copaySpecialist: n($('bCopayS').value),
+        }
+      };
+    }
 
-    const signOutBtn = document.getElementById('signOutBtn');
-    if (signOutBtn) signOutBtn.addEventListener('click', signOut);
+    function setFormFromSaved(saved){
+      if (!saved) return;
+      const e = saved.expected || {};
+      const a = saved.planA || {};
+      const b = saved.planB || {};
+
+      $('allowedSpend').value = e.allowedSpend ?? '';
+      $('primaryVisits').value = e.primaryVisits ?? 2;
+      $('specialistVisits').value = e.specialistVisits ?? 1;
+
+      $('aPremium').value = a.premiumMonthly ?? '';
+      $('aDeductible').value = a.deductible ?? '';
+      $('aCoins').value = a.coinsurancePct ?? '';
+      $('aOop').value = a.oopMax ?? '';
+      $('aCopayP').value = a.copayPrimary ?? '';
+      $('aCopayS').value = a.copaySpecialist ?? '';
+
+      $('bPremium').value = b.premiumMonthly ?? '';
+      $('bDeductible').value = b.deductible ?? '';
+      $('bCoins').value = b.coinsurancePct ?? '';
+      $('bOop').value = b.oopMax ?? '';
+      $('bCopayP').value = b.copayPrimary ?? '';
+      $('bCopayS').value = b.copaySpecialist ?? '';
+    }
+
+    function renderResults(result){
+      $('resultsCard').style.display = 'block';
+
+      $('aYearly').textContent = money(result.planA.totalYearly);
+      $('bYearly').textContent = money(result.planB.totalYearly);
+
+      $('aBreakdown').textContent = result.planA.breakdown;
+      $('bBreakdown').textContent = result.planB.breakdown;
+
+      $('winnerBadge').textContent = result.winner;
+      $('whyText').textContent = result.why;
+
+      // Helpful link into assistant
+      const q = encodeURIComponent(`I compared two plans. ${result.why} Can you explain what deductible/coinsurance/OOP max mean here?`);
+      $('askAiLink').href = `assistant.html?q=${q}`;
+
+      // Optional badges
+      $('planAResultBadge').style.display = 'inline-block';
+      $('planBResultBadge').style.display = 'inline-block';
+      $('planAResultBadge').textContent = money(result.planA.totalYearly);
+      $('planBResultBadge').textContent = money(result.planB.totalYearly);
+    }
+
+    async function calculateOnly(){
+      hideError();
+      const payload = getPayload();
+
+      try {
+        const res = await fetch('/api/compare/calc', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          credentials:'same-origin',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+          window.location.replace('signin.html');
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showError(data.error || 'Unable to calculate.');
+          return;
+        }
+
+        renderResults(data.result);
+      } catch {
+        showError('Network/server error. Is the backend running?');
+      }
+    }
+
+    async function saveAndCalculate(){
+      hideError();
+      const payload = getPayload();
+
+      try {
+        const res = await fetch('/api/compare', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          credentials:'same-origin',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+          window.location.replace('signin.html');
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showError(data.error || 'Unable to save.');
+          return;
+        }
+
+        renderResults(data.result);
+      } catch {
+        showError('Network/server error. Is the backend running?');
+      }
+    }
+
+    async function loadSaved(){
+      try {
+        const res = await fetch('/api/compare', { credentials:'same-origin', cache:'no-store' });
+        if (res.status === 401) {
+          window.location.replace('signin.html');
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (data && data.compare) {
+          setFormFromSaved(data.compare);
+          if (data.compare.lastResult) {
+            $('resultsCard').style.display = 'block';
+            renderResults(data.compare.lastResult);
+          }
+        }
+      } catch {}
+    }
+
+    // boot
+    requireSession().then(() => loadSaved());
+
+    $('signOutBtn').addEventListener('click', signOut);
+    $('calcBtn').addEventListener('click', calculateOnly);
+    $('saveBtn').addEventListener('click', saveAndCalculate);
   </script>
 </body>
 </html>

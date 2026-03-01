@@ -45,70 +45,324 @@
           </p>
         </div>
 
+        <!-- Summary -->
+        <div class="card pad-lg" aria-labelledby="summary-title">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <h2 id="summary-title" class="h3">Your estimate</h2>
+            <span class="badge" id="saveStatus">Not saved yet</span>
+          </div>
+
+          <div class="summary" style="margin-top:12px;">
+            <div class="card kpi">
+              <div class="label">Monthly Cost (est.)</div>
+              <div class="value" id="monthlyEstimate">$—</div>
+              <p class="muted2">Premium + meds + expected copays</p>
+            </div>
+
+            <div class="card kpi">
+              <div class="label">Copays / year (est.)</div>
+              <div class="value" id="copaysYear">$—</div>
+              <p class="muted2">Primary + specialist visits</p>
+            </div>
+
+            <div class="card kpi">
+              <div class="label">Emergency buffer target</div>
+              <div class="value" id="bufferTarget">$—</div>
+              <p class="muted2">Suggested “just in case” cushion</p>
+            </div>
+          </div>
+
+          <p class="muted2" id="bufferSuggestion" style="margin-top:10px;">
+            Tip: enter a buffer target to get a suggested monthly buffer contribution.
+          </p>
+        </div>
+
+        <!-- Form -->
         <div class="card pad-lg">
-          <h2 class="h3">Monthly budget builder (UI placeholder)</h2>
+          <h2 class="h3">Monthly budget builder</h2>
           <p class="muted2" style="margin-top:8px;">
-            Next you can add: premium, meds, expected visits, copays, and a recommended emergency fund target.
+            Enter your best guesses — you can always edit later. This saves to your account.
           </p>
 
-          <div class="card pad" style="margin-top:12px;">
-            <p class="muted2">Form inputs + live summary will go here.</p>
-          </div>
+          <form id="budgetForm" style="margin-top:12px;">
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px;">
+              <div class="field">
+                <label for="monthlyPremium">Monthly premium ($)</label>
+                <input id="monthlyPremium" type="number" min="0" step="1" placeholder="ex. 320" required />
+              </div>
+
+              <div class="field">
+                <label for="meds">Monthly meds ($)</label>
+                <input id="meds" type="number" min="0" step="1" placeholder="ex. 25" required />
+              </div>
+
+              <div class="field">
+                <label for="primaryVisitsPerYear">Primary care visits per year</label>
+                <input id="primaryVisitsPerYear" type="number" min="0" step="1" placeholder="ex. 2" required />
+              </div>
+
+              <div class="field">
+                <label for="specialistVisitsPerYear">Specialist visits per year</label>
+                <input id="specialistVisitsPerYear" type="number" min="0" step="1" placeholder="ex. 1" required />
+              </div>
+
+              <div class="field">
+                <label for="copayPrimary">Primary copay ($)</label>
+                <input id="copayPrimary" type="number" min="0" step="1" placeholder="ex. 30" required />
+              </div>
+
+              <div class="field">
+                <label for="copaySpecialist">Specialist copay ($)</label>
+                <input id="copaySpecialist" type="number" min="0" step="1" placeholder="ex. 60" required />
+              </div>
+
+              <div class="field" style="grid-column: 1 / -1;">
+                <label for="emergencyBufferTarget">Emergency buffer target ($)</label>
+                <input id="emergencyBufferTarget" type="number" min="0" step="1" placeholder="ex. 1500" />
+                <p class="muted2" style="margin-top:6px; font-size:13px;">
+                  This doesn’t affect your monthly cost estimate; it’s a separate “buffer goal”.
+                </p>
+              </div>
+            </div>
+
+            <div id="errorBox" class="card pad" style="display:none; margin-top:12px; border-color: rgba(239,68,68,0.35);">
+              <strong style="color:#b91c1c;">Couldn’t save</strong>
+              <p id="errorText" class="muted2" style="margin-top:6px;"></p>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;">
+              <button class="btn btn-ghost" id="resetBtn" type="button">Reset</button>
+              <button class="btn btn-primary" type="submit">Save & Update Estimate</button>
+            </div>
+          </form>
         </div>
       </section>
 
       <aside class="right-rail">
         <section class="card pad">
-          <strong>Quick tip</strong>
+          <strong>What this means</strong>
           <p style="margin-top:8px;">
-            For budgeting: use a “routine estimate” + a smaller monthly “buffer” that grows over time.
+            Your estimate is a planning number — real bills vary depending on what’s covered and whether care is in-network.
           </p>
           <div style="margin-top:10px;">
-            <a class="btn btn-ghost" href="assistant.html" style="width:100%;">Ask AI for an estimate</a>
+            <a class="btn btn-ghost" href="compare.html" style="width:100%;">Compare plans with these inputs</a>
+          </div>
+        </section>
+
+        <section class="card pad">
+          <strong>Try asking AI</strong>
+          <p class="muted2" style="margin-top:8px;">Example:</p>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+            <a class="pill" href="assistant.html">Is $1500 a good emergency buffer?</a>
+            <a class="pill" href="assistant.html">How many visits should I budget for?</a>
           </div>
         </section>
       </aside>
     </section>
 
     <footer class="footer">
-      <div class="muted2">Budget page (demo).</div>
+      <div class="muted2">Budget saves to your account (demo backend).</div>
     </footer>
   </main>
 
-<script>
-  async function requireSessionOrRedirect() {
-    try {
-      const res = await fetch('/api/me', {
-        credentials: 'same-origin',
-        cache: 'no-store'
-      });
-      const data = await res.json();
-
-      if (!data || !data.user) {
+  <script>
+    // ---------- Auth guard (SESSION-BASED) ----------
+    async function requireSession() {
+      try {
+        const res = await fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' });
+        const data = await res.json();
+        if (!data || !data.user) {
+          window.location.replace('signin.html');
+          return null;
+        }
+        return data.user;
+      } catch (e) {
         window.location.replace('signin.html');
         return null;
       }
-      return data.user;
-    } catch (e) {
-      window.location.replace('signin.html');
-      return null;
     }
-  }
 
-  async function signOut() {
-    try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'same-origin'
-      });
-    } catch (e) {}
-    window.location.replace('index.html');
-  }
+    async function signOut() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+      } catch (e) {}
+      window.location.replace('index.html');
+    }
 
-  requireSessionOrRedirect();
+    document.getElementById('signOutBtn')?.addEventListener('click', signOut);
 
-  const signOutBtn = document.getElementById('signOutBtn');
-  if (signOutBtn) signOutBtn.addEventListener('click', signOut);
-</script>
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+
+    const fmtMoney = (n) => {
+      const x = Number(n);
+      if (!Number.isFinite(x)) return '$—';
+      return '$' + x.toFixed(0);
+    };
+
+    const num = (v) => {
+      const x = Number(v);
+      return Number.isFinite(x) ? x : 0;
+    };
+
+    function showError(msg) {
+      $('errorText').textContent = msg || 'Something went wrong.';
+      $('errorBox').style.display = 'block';
+    }
+    function hideError() {
+      $('errorBox').style.display = 'none';
+      $('errorText').textContent = '';
+    }
+
+    function setSavedBadge(text, ok=true) {
+      const el = $('saveStatus');
+      el.textContent = text;
+      // keep your existing badge style; just change text
+    }
+
+    function updateLocalPreview() {
+      const monthlyPremium = num($('monthlyPremium').value);
+      const meds = num($('meds').value);
+
+      const primaryVisitsPerYear = Math.max(0, Math.floor(num($('primaryVisitsPerYear').value)));
+      const specialistVisitsPerYear = Math.max(0, Math.floor(num($('specialistVisitsPerYear').value)));
+
+      const copayPrimary = num($('copayPrimary').value);
+      const copaySpecialist = num($('copaySpecialist').value);
+
+      const emergencyBufferTarget = num($('emergencyBufferTarget').value);
+
+      const copaysYear = (primaryVisitsPerYear * copayPrimary) + (specialistVisitsPerYear * copaySpecialist);
+      const monthlyEstimate = monthlyPremium + meds + (copaysYear / 12);
+
+      $('monthlyEstimate').textContent = fmtMoney(monthlyEstimate);
+      $('copaysYear').textContent = fmtMoney(copaysYear);
+      $('bufferTarget').textContent = fmtMoney(emergencyBufferTarget);
+
+      if (emergencyBufferTarget > 0) {
+        const monthlyBuffer = emergencyBufferTarget / 12;
+        $('bufferSuggestion').textContent =
+          `If you want to reach your buffer in ~12 months, set aside about ${fmtMoney(monthlyBuffer)} per month.`;
+      } else {
+        $('bufferSuggestion').textContent =
+          'Tip: enter a buffer target to get a suggested monthly buffer contribution.';
+      }
+    }
+
+    // ---------- Load + Save from backend ----------
+    async function loadBudget() {
+      try {
+        const res = await fetch('/api/budget', { credentials: 'same-origin', cache: 'no-store' });
+        if (res.status === 401) {
+          window.location.replace('signin.html');
+          return;
+        }
+        const data = await res.json();
+        const b = data?.budget;
+
+        if (b) {
+          $('monthlyPremium').value = b.monthly_premium ?? 0;
+          $('meds').value = b.meds ?? 0;
+          $('primaryVisitsPerYear').value = b.primary_visits_per_year ?? 0;
+          $('specialistVisitsPerYear').value = b.specialist_visits_per_year ?? 0;
+          $('copayPrimary').value = b.copay_primary ?? 0;
+          $('copaySpecialist').value = b.copay_specialist ?? 0;
+          $('emergencyBufferTarget').value = b.emergency_buffer_target ?? 0;
+
+          // Show stored computed value if present
+          if (Number.isFinite(Number(b.computed_monthly_estimate))) {
+            $('monthlyEstimate').textContent = fmtMoney(b.computed_monthly_estimate);
+          }
+
+          setSavedBadge('Loaded');
+        } else {
+          setSavedBadge('Not saved yet');
+        }
+
+        updateLocalPreview();
+      } catch (e) {
+        // If budget load fails, still allow user to type; just show local preview
+        setSavedBadge('Offline');
+        updateLocalPreview();
+      }
+    }
+
+    async function saveBudget() {
+      hideError();
+      setSavedBadge('Saving…');
+
+      const payload = {
+        monthlyPremium: num($('monthlyPremium').value),
+        meds: num($('meds').value),
+        primaryVisitsPerYear: Math.max(0, Math.floor(num($('primaryVisitsPerYear').value))),
+        specialistVisitsPerYear: Math.max(0, Math.floor(num($('specialistVisitsPerYear').value))),
+        copayPrimary: num($('copayPrimary').value),
+        copaySpecialist: num($('copaySpecialist').value),
+        emergencyBufferTarget: num($('emergencyBufferTarget').value)
+      };
+
+      try {
+        const res = await fetch('/api/budget', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+          window.location.replace('signin.html');
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setSavedBadge('Save failed');
+          showError(data.error || 'Unable to save budget.');
+          return;
+        }
+
+        // Update UI with server-computed result (source of truth)
+        if (data && Number.isFinite(Number(data.computedMonthlyEstimate))) {
+          $('monthlyEstimate').textContent = fmtMoney(data.computedMonthlyEstimate);
+        }
+
+        setSavedBadge('Saved');
+      } catch (e) {
+        setSavedBadge('Save failed');
+        showError('Network/server error. Is the backend running on http://localhost:3000 ?');
+      }
+    }
+
+    // ---------- Wire up events ----------
+    $('budgetForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      updateLocalPreview();
+      await saveBudget();
+    });
+
+    $('resetBtn').addEventListener('click', () => {
+      $('monthlyPremium').value = '';
+      $('meds').value = '';
+      $('primaryVisitsPerYear').value = '';
+      $('specialistVisitsPerYear').value = '';
+      $('copayPrimary').value = '';
+      $('copaySpecialist').value = '';
+      $('emergencyBufferTarget').value = '';
+      setSavedBadge('Not saved yet');
+      hideError();
+      updateLocalPreview();
+    });
+
+    // Live preview while typing
+    document.getElementById('budgetForm').addEventListener('input', updateLocalPreview);
+    document.getElementById('budgetForm').addEventListener('change', updateLocalPreview);
+
+    // Boot
+    (async function init(){
+      const user = await requireSession();
+      if (!user) return;
+      await loadBudget();
+    })();
+  </script>
 </body>
 </html>

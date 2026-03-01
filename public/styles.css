@@ -411,6 +411,7 @@ input:focus, select:focus{
   color: var(--muted2);
 }
 
+
 /* ===== Chat UI ===== */
 .chat{ padding: 16px; }
 .chat-header{
@@ -436,6 +437,29 @@ input:focus, select:focus{
   gap: 10px;
 }
 .chat-input input{ flex: 1; }
+
+/* Fullscreen chat mode */
+body.chat-fullscreen .container {
+  max-width: 1100px;
+}
+
+body.chat-fullscreen .app {
+  grid-template-columns: 1fr; /* hide right rail */
+}
+
+body.chat-fullscreen .right-rail {
+  display: none;
+}
+
+body.chat-fullscreen .card.chat {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+}
+
+body.chat-fullscreen .card.chat .chat-input input {
+  width: 100%;
+}
 
 /* ===== Auth layout ===== */
 .auth-wrap{

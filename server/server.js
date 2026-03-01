@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
+const assistantRoutes = require("./assistant");
 
 require("./db"); // init db + tables
 const api = require("./routes");
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 // API routes
 app.use("/api", api);
+app.use("/api/assistant", assistantRoutes);
 
 // Optional health check
 app.get("/api/health", (req, res) => res.json({ ok: true }));
