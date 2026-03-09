@@ -6,7 +6,7 @@
   <title>AI Assistant — Smart Health Finance</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="assistant-page">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="container topbar glass">
@@ -70,21 +70,9 @@
         <section class="card chat">
           <div class="chat-header">
             <strong>AI Assistant</strong>
-            <span class="badge">Student-focused</span>
           </div>
 
           <!-- Chat messages will append above input -->
-          <div class="chat-bubble">
-            <strong>You:</strong> Is preventive care free?
-          </div>
-
-          <div class="chat-bubble ai">
-            <strong>AI:</strong>
-            <p style="margin-top:6px;">
-              Many plans cover certain preventive services at no cost when you use in-network providers.
-              But it can change if the visit becomes diagnostic (tests for symptoms).
-            </p>
-          </div>
 
           <div class="chat-input">
             <label for="chatq" style="position:absolute; left:-9999px;">Type a question</label>
@@ -125,7 +113,9 @@
     </section>
 
     <footer class="footer">
-      <div class="muted2">Educational guidance only. Not medical or financial advice. Property of Avni Doshi.</div>
+      <div class="container footer-single">
+        Educational tool (not medical or financial advice). © 2026 Smart Health Finance · Avni Doshi
+      </div>
     </footer>
   </main>
 
@@ -155,9 +145,7 @@
     }
 
     function expandChat() {
-      // Make chat take full width of the app grid
       main.style.gridColumn = "1 / -1";
-      chatBox.style.minHeight = "70vh";
     }
 
     function escapeHtml(str) {

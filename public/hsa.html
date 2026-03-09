@@ -40,7 +40,7 @@
         <div class="card pad-lg">
           <h1 class="h2">Maximize your HSA</h1>
           <p style="margin-top:8px;">
-            HSAs can help pay for qualified medical expenses now — and can also support future healthcare costs.
+            HSAs can help pay for qualified medical expenses support future healthcare costs.
           </p>
           <p class="muted2" style="margin-top:6px;">
             Start here: enter your basics, then we’ll estimate how close you are to your annual contribution goal.
@@ -50,7 +50,7 @@
         <div class="card pad-lg">
           <h2 class="h3">Your HSA details</h2>
 
-          <form id="hsaForm" style="margin-top:12px; display:grid; gap:12px; max-width: 860px;">
+          <form id="hsaForm" style="margin:12px auto 0; display:grid; gap:12px; max-width: 860px; width:100%;">
             <div class="field">
               <label for="coverageType">Coverage type</label>
               <select id="coverageType">
@@ -59,7 +59,7 @@
                 <option value="family">Family</option>
               </select>
               <p class="muted2" style="margin-top:6px; font-size:13px;">
-                This affects IRS limits, but we still ask you to enter your annual limit below (to keep it accurate).
+                IRS contribution limits depend on coverage type.
               </p>
             </div>
 
@@ -97,7 +97,7 @@
                 <label for="investPercent">Investing preference (0–100%)</label>
                 <input id="investPercent" type="number" min="0" max="100" step="1" placeholder="ex. 30" />
                 <p class="muted2" style="margin-top:6px; font-size:13px;">
-                  This is just a planning preference (not financial advice).
+                  This is just a planning preference.
                 </p>
               </div>
             </div>
@@ -119,7 +119,6 @@
         <div class="card pad-lg" aria-live="polite">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
             <h2 class="h3">Your HSA plan summary</h2>
-            <span class="badge" id="statusBadge">Live</span>
           </div>
 
           <div class="summary" style="margin-top:12px;">
@@ -168,7 +167,9 @@
     </section>
 
     <footer class="footer">
-      <div class="muted2">Property of Avni Doshi.</div>
+      <div class="container footer-single">
+        Educational tool (not medical or financial advice). © 2026 Smart Health Finance · Avni Doshi
+      </div>
     </footer>
   </main>
 
@@ -296,7 +297,7 @@
         return;
       }
 
-      $('saveMsg').textContent = 'Saved ✅';
+      $('saveMsg').textContent = 'Saved';
       $('saveMsg').style.display = 'block';
       computeAndRender();
       setTimeout(() => { $('saveMsg').style.display = 'none'; }, 1200);

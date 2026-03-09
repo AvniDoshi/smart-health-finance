@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS hsa (
   expected_annual_expenses REAL DEFAULT 0,
   strategy_notes TEXT,
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY(user_id) REFERENCES users(id)
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS compare (

@@ -35,4 +35,4 @@ app.use("/api/assistant", assistantRoutes);
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`✅ Server running: http://localhost:${port}`));
+app.listen(port, () => console.log(`Server running: http://localhost:${port}`));
